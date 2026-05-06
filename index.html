@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Multi-Tool Hub</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #ffffff;
+      --bg-secondary: #f5f5f4;
+      --bg-tertiary: #f0efeb;
+      --text-primary: #1a1a18;
+      --text-secondary: #6b6b68;
+      --text-tertiary: #a0a09d;
+      --border: rgba(0,0,0,0.12);
+      --border-hover: rgba(0,0,0,0.25);
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --success-bg: #eaf3de;
+      --success-text: #3b6d11;
+      --info-text: #185fa5;
+      --info-border: rgba(24,95,165,0.3);
+      --danger-text: #a32d2d;
+      --danger-border: rgba(163,45,45,0.3);
+      --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1c1c1a;
+        --bg-secondary: #252523;
+        --bg-tertiary: #2c2c2a;
+        --text-primary: #f0efeb;
+        --text-secondary: #a0a09d;
+        --text-tertiary: #6b6b68;
+        --border: rgba(255,255,255,0.12);
+        --border-hover: rgba(255,255,255,0.25);
+        --success-bg: #173404;
+        --success-text: #97c459;
+        --info-text: #85b7eb;
+        --info-border: rgba(133,183,235,0.3);
+        --danger-text: #f09595;
+        --danger-border: rgba(240,149,149,0.3);
+      }
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 560px;
+    }
+
+    h1 {
+      font-size: 22px;
+      font-weight: 500;
+      margin-bottom: 1.5rem;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      padding: 8px 18px;
+      border-radius: 999px;
+      border: 0.5px solid var(--border-hover);
+      background: var(--bg);
+      color: var(--text-secondary);
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+      font-family: var(--font);
+    }
+
+    .tab-btn:hover { background: var(--bg-secondary); color: var(--text-primary); }
+    .tab-btn.active {
+      background: var(--text-primary);
+      color: var(--bg);
+      border-color: var(--text-primary);
+    }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* ── Card shell ── */
+    .card {
+      background: var(--bg);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+    }
+
+    /* ── Currency ── */
+    .rate-badge {
+      font-size: 12px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--success-bg);
+      color: var(--success-text);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 1rem;
+    }
+
+    .card-title { font-size: 15px; font-weight: 500; }
+
+    .fx-row {
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+      flex-wrap: wrap;
+    }
+
+    .fx-col {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+      min-width: 120px;
+    }
+
+    .fx-col label { font-size: 12px; color: var(--text-secondary); }
+
+    .fx-col input, .fx-col select {
+      padding: 8px 12px;
+      border-radius: var(--radius-md);
+      border: 0.5px solid var(--border-hover);
+      background: var(--bg);
+      color: var(--text-primary);
+      font-size: 16px;
+      font-family: var(--font);
+      width: 100%;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .fx-col input:focus, .fx-col select:focus { border-color: var(--text-secondary); }
+
+    .swap-btn {
+      padding: 8px 12px;
+      border-radius: var(--radius-md);
+      border: 0.5px solid var(--border-hover);
+      background: var(--bg-secondary);
+      cursor: pointer;
+      font-size: 18px;
+      color: var(--text-secondary);
+      align-self: flex-end;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.15s;
+    }
+
+    .swap-btn:hover { color: var(--text-primary); }
+
+    .result-box {
+      margin-top: 1rem;
+      padding: 1rem 1.25rem;
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .result-amount { font-size: 28px; font-weight: 500; }
+    .result-label { font-size: 13px; color: var(--text-secondary); }
+    .rate-info { font-size: 12px; color: var(--text-tertiary); margin-top: 8px; }
+
+    /* ── Calculator ── */
+    .calc-wrap { max-width: 320px; margin: 0 auto; }
+
+    .calc-display {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      text-align: right;
+      margin-bottom: 12px;
+      min-height: 72px;
+    }
+
+    .calc-expr { font-size: 13px; color: var(--text-tertiary); min-height: 18px; word-break: break-all; }
+    .calc-result { font-size: 32px; font-weight: 500; word-break: break-all; }
+
+    .calc-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .calc-key {
+      padding: 14px 4px;
+      border-radius: var(--radius-md);
+      border: 0.5px solid var(--border);
+      background: var(--bg);
+      color: var(--text-primary);
+      font-size: 16px;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: background 0.1s, transform 0.08s;
+      text-align: center;
+    }
+
+    .calc-key:hover { background: var(--bg-secondary); }
+    .calc-key:active { transform: scale(0.96); }
+    .calc-key.op { color: var(--info-text); border-color: var(--info-border); }
+    .calc-key.clr { color: var(--danger-text); border-color: var(--danger-border); }
+    .calc-key.eq {
+      background: var(--text-primary);
+      color: var(--bg);
+      border-color: var(--text-primary);
+    }
+    .calc-key.eq:hover { opacity: 0.85; }
+    .calc-key.wide { grid-column: span 2; }
+
+    /* ── Love Meter ── */
+    .love-inputs { display: flex; flex-direction: column; gap: 12px; margin-bottom: 1.25rem; }
+
+    .love-inputs input {
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      border: 0.5px solid var(--border-hover);
+      background: var(--bg);
+      color: var(--text-primary);
+      font-size: 16px;
+      font-family: var(--font);
+      text-align: center;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .love-inputs input:focus { border-color: var(--text-secondary); }
+    .love-sep { text-align: center; font-size: 22px; color: var(--text-tertiary); }
+
+    .primary-btn {
+      width: 100%;
+      padding: 12px;
+      border-radius: var(--radius-md);
+      border: none;
+      background: var(--text-primary);
+      color: var(--bg);
+      font-size: 16px;
+      cursor: pointer;
+      font-family: var(--font);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: opacity 0.15s;
+    }
+
+    .primary-btn:hover { opacity: 0.85; }
+
+    .meter-wrap { margin-top: 1.25rem; display: none; }
+
+    .meter-names {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    .meter-track {
+      height: 20px;
+      border-radius: 999px;
+      background: var(--bg-secondary);
+      overflow: hidden;
+      border: 0.5px solid var(--border);
+    }
+
+    .meter-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      background: var(--text-primary);
+      transition: width 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .meter-score { text-align: center; margin-top: 14px; }
+    .score-num { font-size: 52px; font-weight: 500; line-height: 1; }
+    .score-label { font-size: 14px; color: var(--text-secondary); margin-top: 4px; }
+
+    .score-msg {
+      margin-top: 12px;
+      padding: 10px 14px;
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .hearts { font-size: 28px; letter-spacing: 4px; text-align: center; margin-top: 10px; }
+
+    /* ── Responsive ── */
+    @media (max-width: 480px) {
+      .fx-row { flex-direction: column; }
+      .swap-btn { align-self: center; transform: rotate(90deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1><i class="ti ti-apps"></i> Multi-Tool Hub</h1>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('currency', this)">
+        <i class="ti ti-currency-dollar"></i> Currency
+      </button>
+      <button class="tab-btn" onclick="switchTab('calc', this)">
+        <i class="ti ti-calculator"></i> Calculator
+      </button>
+      <button class="tab-btn" onclick="switchTab('love', this)">
+        <i class="ti ti-heart"></i> Love meter
+      </button>
+    </div>
+
+    <!-- Currency Panel -->
+    <div id="panel-currency" class="panel active">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Live currency converter</div>
+          <span class="rate-badge" id="live-badge">
+            <i class="ti ti-circle-dot"></i>
+            <span id="badge-text">Loading...</span>
+          </span>
+        </div>
+        <div class="fx-row">
+          <div class="fx-col">
+            <label>Amount</label>
+            <input type="number" id="fx-amount" value="1" min="0" oninput="convertCurrency()" />
+          </div>
+          <div class="fx-col">
+            <label>From</label>
+            <select id="fx-from" onchange="convertCurrency()"></select>
+          </div>
+          <button class="swap-btn" onclick="swapCurrencies()" title="Swap currencies">
+            <i class="ti ti-arrows-right-left"></i>
+          </button>
+          <div class="fx-col">
+            <label>To</label>
+            <select id="fx-to" onchange="convertCurrency()"></select>
+          </div>
+        </div>
+        <div class="result-box">
+          <div>
+            <div class="result-label" id="result-from-label">—</div>
+            <div class="result-amount" id="fx-result">—</div>
+            <div class="result-label" id="result-to-label">—</div>
+          </div>
+          <div id="rate-display" style="text-align:right; font-size:13px; color:var(--text-tertiary);"></div>
+        </div>
+        <div class="rate-info" id="rate-timestamp"></div>
+      </div>
+    </div>
+
+    <!-- Calculator Panel -->
+    <div id="panel-calc" class="panel">
+      <div class="card">
+        <div class="calc-wrap">
+          <div class="calc-display">
+            <div class="calc-expr" id="calc-expr"></div>
+            <div class="calc-result" id="calc-disp">0</div>
+          </div>
+          <div class="calc-grid">
+            <button class="calc-key clr" onclick="calcClear()">AC</button>
+            <button class="calc-key op" onclick="calcSign()">+/−</button>
+            <button class="calc-key op" onclick="calcPercent()">%</button>
+            <button class="calc-key op" onclick="calcOp('÷')">÷</button>
+
+            <button class="calc-key" onclick="calcNum('7')">7</button>
+            <button class="calc-key" onclick="calcNum('8')">8</button>
+            <button class="calc-key" onclick="calcNum('9')">9</button>
+            <button class="calc-key op" onclick="calcOp('×')">×</button>
+
+            <button class="calc-key" onclick="calcNum('4')">4</button>
+            <button class="calc-key" onclick="calcNum('5')">5</button>
+            <button class="calc-key" onclick="calcNum('6')">6</button>
+            <button class="calc-key op" onclick="calcOp('−')">−</button>
+
+            <button class="calc-key" onclick="calcNum('1')">1</button>
+            <button class="calc-key" onclick="calcNum('2')">2</button>
+            <button class="calc-key" onclick="calcNum('3')">3</button>
+            <button class="calc-key op" onclick="calcOp('+')">+</button>
+
+            <button class="calc-key wide" onclick="calcNum('0')">0</button>
+            <button class="calc-key" onclick="calcDot()">.</button>
+            <button class="calc-key eq" onclick="calcEquals()">=</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Love Meter Panel -->
+    <div id="panel-love" class="panel">
+      <div class="card">
+        <div class="love-inputs">
+          <input type="text" id="name1" placeholder="Your name" maxlength="40" />
+          <div class="love-sep"><i class="ti ti-heart"></i></div>
+          <input type="text" id="name2" placeholder="Their name" maxlength="40" />
+        </div>
+        <button class="primary-btn" onclick="calcLove()">
+          <i class="ti ti-heart"></i> Calculate love
+        </button>
+        <div class="meter-wrap" id="meter-wrap">
+          <div class="meter-names">
+            <span id="m-name1">—</span>
+            <span id="m-name2">—</span>
+          </div>
+          <div class="meter-track">
+            <div class="meter-fill" id="meter-fill"></div>
+          </div>
+          <div class="meter-score">
+            <div class="score-num" id="score-num">—</div>
+            <div class="score-label">compatibility</div>
+            <div class="score-msg" id="score-msg"></div>
+            <div class="hearts" id="hearts-row"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ── Tab switching ── */
+    function switchTab(name, btn) {
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('panel-' + name).classList.add('active');
+      btn.classList.add('active');
+    }
+
+    /* ── Currency ── */
+    const CURRENCIES = [
+      ['USD','US Dollar'],['EUR','Euro'],['GBP','British Pound'],['JPY','Japanese Yen'],
+      ['AUD','Australian Dollar'],['CAD','Canadian Dollar'],['CHF','Swiss Franc'],
+      ['CNY','Chinese Yuan'],['INR','Indian Rupee'],['MXN','Mexican Peso'],
+      ['BRL','Brazilian Real'],['KRW','South Korean Won'],['SGD','Singapore Dollar'],
+      ['HKD','Hong Kong Dollar'],['NOK','Norwegian Krone'],['SEK','Swedish Krona'],
+      ['DKK','Danish Krone'],['NZD','New Zealand Dollar'],['ZAR','South African Rand'],
+      ['RUB','Russian Ruble'],['TRY','Turkish Lira'],['AED','UAE Dirham'],
+      ['SAR','Saudi Riyal'],['THB','Thai Baht'],['IDR','Indonesian Rupiah'],
+      ['MYR','Malaysian Ringgit'],['PHP','Philippine Peso'],['PLN','Polish Zloty'],
+      ['CZK','Czech Koruna'],['HUF','Hungarian Forint']
+    ];
+
+    let rates = {};
+    let ratesLoaded = false;
+
+    const fromSel = document.getElementById('fx-from');
+    const toSel = document.getElementById('fx-to');
+
+    CURRENCIES.forEach(([code, name]) => {
+      [fromSel, toSel].forEach(sel => {
+        const o = document.createElement('option');
+        o.value = code;
+        o.textContent = `${code} — ${name}`;
+        sel.appendChild(o);
+      });
+    });
+    fromSel.value = 'USD';
+    toSel.value = 'EUR';
+
+    async function fetchRates() {
+      try {
+        const res = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        rates = data.rates;
+        ratesLoaded = true;
+        const ts = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        document.getElementById('badge-text').textContent = 'Live • updated ' + ts;
+        document.getElementById('rate-timestamp').textContent = 'Rates via exchangerate-api.com • auto-refreshes every 30 min';
+        convertCurrency();
+      } catch (e) {
+        document.getElementById('badge-text').textContent = 'Offline — fallback rates';
+        rates = {
+          USD:1, EUR:0.92, GBP:0.79, JPY:149.5, AUD:1.52, CAD:1.36, CHF:0.90,
+          CNY:7.24, INR:83.1, MXN:17.2, BRL:4.97, KRW:1325, SGD:1.34, HKD:7.82,
+          NOK:10.6, SEK:10.4, DKK:6.88, NZD:1.63, ZAR:18.6, RUB:89.5, TRY:30.7,
+          AED:3.67, SAR:3.75, THB:35.1, IDR:15600, MYR:4.67, PHP:56.5,
+          PLN:4.01, CZK:22.6, HUF:356
+        };
+        ratesLoaded = true;
+        convertCurrency();
+      }
+    }
+
+    function convertCurrency() {
+      if (!ratesLoaded) return;
+      const amount = parseFloat(document.getElementById('fx-amount').value) || 0;
+      const from = fromSel.value;
+      const to = toSel.value;
+      const rFrom = rates[from] || 1;
+      const rTo = rates[to] || 1;
+      const result = (amount / rFrom) * rTo;
+      const precision = result < 1 ? 6 : 2;
+      document.getElementById('fx-result').textContent =
+        result.toLocaleString('en-US', { maximumFractionDigits: precision });
+      document.getElementById('result-from-label').textContent =
+        `${amount.toLocaleString()} ${from} =`;
+      document.getElementById('result-to-label').textContent = to;
+      const unitRate = (1 / rFrom) * rTo;
+      document.getElementById('rate-display').innerHTML =
+        `1 ${from}<br>= ${unitRate.toFixed(4)} ${to}`;
+    }
+
+    function swapCurrencies() {
+      const tmp = fromSel.value;
+      fromSel.value = toSel.value;
+      toSel.value = tmp;
+      convertCurrency();
+    }
+
+    setInterval(fetchRates, 30 * 60 * 1000);
+    fetchRates();
+
+    /* ── Calculator ── */
+    let cExpr = '', cCurrent = '0', cNewNum = true, cLastOp = '', cResult = null;
+
+    function dispUpdate() {
+      document.getElementById('calc-disp').textContent = cCurrent;
+      document.getElementById('calc-expr').textContent = cExpr;
+    }
+
+    function calcNum(n) {
+      if (cNewNum) { cCurrent = n; cNewNum = false; }
+      else cCurrent = cCurrent === '0' ? n : cCurrent + n;
+      dispUpdate();
+    }
+
+    function calcDot() {
+      if (cNewNum) { cCurrent = '0.'; cNewNum = false; }
+      else if (!cCurrent.includes('.')) cCurrent += '.';
+      dispUpdate();
+    }
+
+    function calcOp(op) {
+      if (!cNewNum) computePending();
+      cResult = parseFloat(cCurrent);
+      cExpr = cCurrent + ' ' + op;
+      cLastOp = op;
+      cNewNum = true;
+      dispUpdate();
+    }
+
+    function computePending() {
+      if (!cLastOp || cResult === null) return;
+      const b = parseFloat(cCurrent);
+      let r;
+      if (cLastOp === '+') r = cResult + b;
+      else if (cLastOp === '−') r = cResult - b;
+      else if (cLastOp === '×') r = cResult * b;
+      else if (cLastOp === '÷') r = b !== 0 ? cResult / b : NaN;
+      cExpr += ' ' + cCurrent + ' =';
+      if (isNaN(r)) { cCurrent = 'Error'; }
+      else cCurrent = parseFloat(r.toPrecision(12)).toString();
+      cResult = null; cLastOp = ''; cNewNum = true;
+    }
+
+    function calcEquals() { computePending(); dispUpdate(); }
+
+    function calcClear() {
+      cExpr = ''; cCurrent = '0'; cNewNum = true; cLastOp = ''; cResult = null;
+      dispUpdate();
+    }
+
+    function calcSign() {
+      cCurrent = (parseFloat(cCurrent) * -1).toString();
+      dispUpdate();
+    }
+
+    function calcPercent() {
+      cCurrent = (parseFloat(cCurrent) / 100).toString();
+      dispUpdate();
+    }
+
+    /* Keyboard support for calculator */
+    document.addEventListener('keydown', e => {
+      if (document.getElementById('panel-calc').classList.contains('active')) {
+        if (e.key >= '0' && e.key <= '9') calcNum(e.key);
+        else if (e.key === '.') calcDot();
+        else if (e.key === '+') calcOp('+');
+        else if (e.key === '-') calcOp('−');
+        else if (e.key === '*') calcOp('×');
+        else if (e.key === '/') { e.preventDefault(); calcOp('÷'); }
+        else if (e.key === 'Enter' || e.key === '=') calcEquals();
+        else if (e.key === 'Backspace') {
+          if (cCurrent.length > 1) cCurrent = cCurrent.slice(0, -1);
+          else cCurrent = '0';
+          dispUpdate();
+        }
+        else if (e.key === 'Escape') calcClear();
+        else if (e.key === '%') calcPercent();
+      }
+    });
+
+    /* ── Love Meter ── */
+    function calcLove() {
+      const n1 = document.getElementById('name1').value.trim();
+      const n2 = document.getElementById('name2').value.trim();
+      if (!n1 || !n2) { alert('Please enter both names!'); return; }
+      const combined = (n1 + n2).toUpperCase().replace(/\s/g, '');
+      let hash = 0;
+      for (let i = 0; i < combined.length; i++) {
+        hash = ((hash << 5) - hash) + combined.charCodeAt(i);
+        hash |= 0;
+      }
+      const score = Math.abs(hash) % 101;
+      document.getElementById('m-name1').textContent = n1;
+      document.getElementById('m-name2').textContent = n2;
+      document.getElementById('score-num').textContent = score + '%';
+      const fill = document.getElementById('meter-fill');
+      const wrap = document.getElementById('meter-wrap');
+      wrap.style.display = 'block';
+      fill.style.width = '0%';
+      setTimeout(() => { fill.style.width = score + '%'; }, 50);
+      let msg, hearts;
+      if (score >= 90)      { msg = '💫 A rare, cosmic connection — you two are written in the stars!'; hearts = '❤️❤️❤️❤️❤️'; }
+      else if (score >= 75) { msg = '🔥 Strong chemistry! This could be something really special.'; hearts = '❤️❤️❤️❤️'; }
+      else if (score >= 55) { msg = '😊 Good compatibility — with effort, this can blossom beautifully.'; hearts = '❤️❤️❤️'; }
+      else if (score >= 35) { msg = '🌱 Potential is there! Take it slow and see where it goes.'; hearts = '❤️❤️'; }
+      else                  { msg = '🤷 Opposites attract sometimes... or maybe just great friends?'; hearts = '❤️'; }
+      document.getElementById('score-msg').textContent = msg;
+      document.getElementById('hearts-row').textContent = hearts;
+    }
+
+    /* Enter key triggers love calc */
+    document.getElementById('name2').addEventListener('keydown', e => {
+      if (e.key === 'Enter') calcLove();
+    });
+  </script>
+</body>
+</html>
